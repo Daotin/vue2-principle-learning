@@ -43,3 +43,47 @@ VNode 也叫做 Virtual DOM，其实就是一棵以 JavaScript 对象（VNode �
 ```
 
 那么如何生成的呢？
+
+## 实现一个 VNode
+
+```js
+class VNode {
+  constructor(tag, data, children, text, elm) {
+    /*当前节点的标签名*/
+    this.tag = tag;
+    /*当前节点的一些数据信息，比如props、attrs等数据*/
+    this.data = data;
+    /*当前节点的子节点，是一个数组*/
+    this.children = children;
+    /*当前节点的文本*/
+    this.text = text;
+    /*当前虚拟节点对应的真实dom节点*/
+    this.elm = elm;
+  }
+}
+```
+
+上面的 html 就可以使用下面 render 方法生产 VNode：
+
+```js
+function render() {
+  return new VNode(
+    "span",
+    {
+      /* 指令集合数组 */
+      directives: [
+        {
+          /* v-show指令 */
+          rawName: "v-show",
+          expression: "isShow",
+          name: "show",
+          value: true,
+        },
+      ],
+      /* 静态class */
+      staticClass: "demo",
+    },
+    [new VNode(undefined, undefined, undefined, "This is a span.")]
+  );
+}
+```
