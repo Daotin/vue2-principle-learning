@@ -87,3 +87,11 @@ function render() {
   );
 }
 ```
+
+## 总结
+
+渲染函数如何生成 VNode 节点的？
+
+渲染函数主要就是调用 VNode 类来生成 VNode 的，所以主要是要**实现 VNode 类**。
+
+实现 VNode 类后，可以将 VNode 进一步封装一下，可以实现一些产生常用 VNode 的方法。比如`createEmptyVNode` ，`createTextVNode` 等等

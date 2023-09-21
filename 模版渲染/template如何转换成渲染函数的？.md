@@ -143,3 +143,11 @@ render () {
 ## 补充
 
 - vue-loader 是解析`.vue`文件，拆分出 template js css，template 由 `vue-template-compile` 编译。
+
+## 总结
+
+template 转换成渲染函数的过程如下：
+
+1. template 通过正则等手段生成 AST
+2. 优化 AST，对 AST 进行 static 静态打标，方便之后的 patch
+3. 根据优化后的 AST，调用各种处理函数生成 render function 渲染函数
