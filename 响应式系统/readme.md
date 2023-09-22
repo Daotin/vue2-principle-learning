@@ -9,7 +9,7 @@ Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 - `defineReactive` 是对一个对象的属性进行响应式处理，get 的时候收集依赖，set 的时候更新视图
 - `observer` 是循环遍历对象，对对象的每个顺序进行`defineReactive`响应式处理
 - `Dep`订阅者类，主要是为每一个属性来收集 Watcher 实例
-- `Watcher`观察者类，就是在视图中，每一处使用到属性的地方，都会有一个 Watcher 进行监听。
+- `Watcher`观察者类，收集依赖，就是在视图中，每一处使用到属性的地方，都会有一个 Watcher 进行监听。
 
 每个属性，Dep，Watcher 的关系：
 
@@ -44,3 +44,32 @@ Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 同时图书馆还有一个总管理员（对应于 Vue 实例的渲染 `Watcher`）。他并不直接管理所有的书，但是当任何一本书的状态发生改变时，对应的图书管理员就会通知他。总管理员的任务就是根据这些信息，确保图书馆的整体运行正常（对应于确保整个 Vue 实例的视图是最新的）。
 
 所以，总的来说，每一本书都有一个专门的图书管理员，而图书馆有一个总管理员。这就像在 Vue 实例中，每个属性都有一个 `Watcher`，而整个 Vue 实例也有一个渲染 `Watcher`。
+
+## 代理
+
+那么问题来了，需要对 this.\_data.text 操作才会触发 set。为了偷懒，我们需要一种方便的方法通过 this.text 直接设置就能触发 set 对视图进行重绘。那么就需要用到代理。
+
+我们可以在 Vue 的构造函数 constructor 中为 data 执行一个代理[proxy](https://github.com/vuejs/vue/blob/dev/src/core/instance/state.js#L33)。这样我们就把 data 上面的属性代理到了 vm 实例上。
+
+```javascript
+_proxy.call(this, options.data); /*构造函数中*/
+
+/*代理*/
+function _proxy(data) {
+  const that = this;
+  Object.keys(data).forEach((key) => {
+    Object.defineProperty(that, key, {
+      configurable: true,
+      enumerable: true,
+      get: function proxyGetter() {
+        return that._data[key];
+      },
+      set: function proxySetter(val) {
+        that._data[key] = val;
+      },
+    });
+  });
+}
+```
+
+我们就可以用 app.text 代替 app.\_data.text 了。
