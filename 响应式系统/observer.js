@@ -68,6 +68,7 @@ class Vue {
     observer(this._data);
 
     /* 新建一个Watcher观察者对象，这时候Dep.target会指向这个Watcher对象 */
+    // PS：这里的watcher没有跟任何的属性绑定，只是单纯的演示
     new Watcher();
 
     /* 在这里模拟render的过程，为了触发test属性的get函数 */

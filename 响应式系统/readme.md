@@ -1,3 +1,5 @@
+# 响应式系统
+
 Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 
 ## 演示操作
@@ -23,9 +25,9 @@ Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 
 而在实际的 Vue 源码中，会对每个属性单独创建 watcher，但是不是在 defineReactive 中创建的，因为在 defineReactive 中创建 Watcher 对象可能会导致问题。defineReactive 是定义在对象的每一个属性上的，如果在这里创建 Watcher，那么每当属性被访问时，都会创建一个新的 Watcher。这显然会导致内存和性能问题。
 
-在 Vue 框架中，Watcher 对象是在编译模板时，针对每个需要动态更新的节点创建的。当节点中的绑定的表达式被求值时（即在渲染函数中被访问时），就会触发对应的 getter 函数，进行依赖收集。
+**在 Vue 框架中，Watcher 对象是在编译模板时，针对每个需要动态更新的节点创建的。**当节点中的绑定的表达式被求值时（即在渲染函数中被访问时），就会触发对应的 getter 函数，进行依赖收集。
 
-## 补充
+## 补充：组件的渲染 watcher 和每个属性的 watcher
 
 在 Vue 2 的源码中，每一个组件（即 Vue 实例）都有一个渲染`Watcher`，我们通常将其称为渲染`Watcher`或者组件的`Watcher`。这个`Watcher`的工作就是重新渲染整个 Vue 组件。
 
@@ -47,11 +49,15 @@ Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 
 ## 代理
 
-那么问题来了，需要对 this.\_data.text 操作才会触发 set。为了偷懒，我们需要一种方便的方法通过 this.text 直接设置就能触发 set 对视图进行重绘。那么就需要用到代理。
+那么问题来了，我们需要对 `this._data.text` 操作才会触发 set。
+
+为了偷懒，我们需要一种方便的方法通过 `this.text` 直接设置就能触发 set 对视图进行重绘。
+
+那么就需要用到代理。
 
 我们可以在 Vue 的构造函数 constructor 中为 data 执行一个代理[proxy](https://github.com/vuejs/vue/blob/dev/src/core/instance/state.js#L33)。这样我们就把 data 上面的属性代理到了 vm 实例上。
 
-```javascript
+```js
 _proxy.call(this, options.data); /*构造函数中*/
 
 /*代理*/
@@ -72,4 +78,4 @@ function _proxy(data) {
 }
 ```
 
-我们就可以用 app.text 代替 app.\_data.text 了。
+我们就可以用 `app.text` 代替 `app._data.text` 了。
