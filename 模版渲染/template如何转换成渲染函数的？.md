@@ -1,3 +1,5 @@
+# template 如何转换成渲染函数的？
+
 compile 编译可以分成 `parse`、`optimize` 与 `generate` 三个阶段，最终需要得到渲染函数 render function。
 
 示例 template：
@@ -105,36 +107,38 @@ var html =
 
 optimize 就是为静态的节点做上一些「标记」，在 patch 的时候我们就可以直接跳过这些被标记的节点的比对，从而达到「优化」的目的。
 
-- isStatic 函数：判断该 node 是否是静态节点
-- markStatic：为所有的节点标记上 static，遍历所有节点通过 isStatic 来判断当前节点是否是静态节点
-- markStaticRoots：对特定的情况进行标记（如果当前节点是静态节点，同时满足该节点并不是只有一个文本节点（作者认为这种情况的优化消耗会大于收益），会标记 staticRoot 为 true）
+- `isStatic` 函数：判断该 node 是否是静态节点
+- `markStatic`：为所有的节点标记上 static，遍历所有节点通过 isStatic 来判断当前节点是否是静态节点
+- `markStaticRoots`：对特定的情况进行标记（如果当前节点是静态节点，同时满足该节点并不是只有一个文本节点（作者认为这种情况的优化消耗会大于收益），会标记 staticRoot 为 true）
 
 ### generate
 
 上面的 parse 和 optimize 后，我们会得到一个 js 类型的 AST，generate 会将 AST 转化成 render funtion 字符串。
 
-- genIf：处理 if 语法
-- genFor： 处理 for 语法
-- genElement：根据当前节点是否有 if 或者 for 标记然后判断是否要用 genIf 或者 genFor 处理，否则通过 genChildren 处理子节点
-- genChildren 比较简单，遍历所有子节点，通过 genNode 处理后用“，”隔开拼接成字符串。
-- genNode 则是根据 type 来判断该节点是用文本节点 genText 还是标签节点 genElement 来处理。
+- `genIf`：处理 if 语法
+- `genFor`： 处理 for 语法
+- `genElement`：根据当前节点是否有 if 或者 for 标记然后判断是否要用 genIf 或者 genFor 处理，否则通过 genChildren 处理子节点
+- `genChildren`：比较简单，遍历所有子节点，通过 genNode 处理后用“，”隔开拼接成字符串。
+- `genNode`：则是根据 type 来判断该节点是用文本节点 genText 还是标签节点 genElement 来处理。
 
 经过 generate 处理后，就能生成 render function：
 
 ```js
 render () {
-    return isShow ? (new VNode('div', {
-        'staticClass': 'demo',
-        'class': c
+  return isShow ? (new VNode(
+    'div',
+    {
+      'staticClass': 'demo',
+      'class': c
     },
-        /* begin */
-        renderList(sz, (item) => {
-            return new VNode('span', {}, [
-                createTextVNode(item);
-            ]);
-        })
-        /* end */
-    )) : createEmptyVNode();
+    /* begin */
+    renderList(sz, (item) => {
+        return new VNode('span', {}, [
+            createTextVNode(item);
+        ]);
+    })
+    /* end */
+  )) : createEmptyVNode();
 }
 ```
 

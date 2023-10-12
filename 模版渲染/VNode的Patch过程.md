@@ -1,3 +1,5 @@
+# VNode 的 Patch 过程
+
 通过 render function 产生的新的 VNode 会和老 VNode 进行一个 patch 的过程，比对得出「差异」，最终将这些「差异」更新到视图上。
 
 ## diff 算法

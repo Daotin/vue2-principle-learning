@@ -1,3 +1,5 @@
+# 渲染函数如何转换成 VNode 节点？
+
 VNode 也叫做 Virtual DOM，其实就是一棵以 JavaScript 对象（VNode 节点）作为基础的树，用对象属性来描述节点，实际上它只是一层对真实 DOM 的抽象。最终可以通过一系列操作使这棵树映射到真实环境上。
 
 ## 如何生成 VNode？
@@ -94,4 +96,4 @@ function render() {
 
 渲染函数主要就是调用 VNode 类来生成 VNode 的，所以主要是要**实现 VNode 类**。
 
-实现 VNode 类后，可以将 VNode 进一步封装一下，可以实现一些产生常用 VNode 的方法。比如`createEmptyVNode` ，`createTextVNode` 等等
+实现 VNode 类后，可以将 VNode 进一步封装一下，可以实现一些产生常用 VNode 的方法。比如`createEmptyVNode` ，`createTextVNode` 等等。
