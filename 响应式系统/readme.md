@@ -2,11 +2,13 @@
 
 Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 
+![](../images/2023-10-12-14-53-03.png)
+
 ## 演示操作
 
 当点击按钮时，会打印`视图更新啦～`提示，表示更新数据，视图也会更新。
 
-## 实现过程
+![](../images/2023-10-12-14-53-38.png)## 实现过程
 
 - `defineReactive` 是对一个对象的属性进行响应式处理，get 的时候收集依赖，set 的时候更新视图
 - `observer` 是循环遍历对象，对对象的每个顺序进行`defineReactive`响应式处理
@@ -25,7 +27,9 @@ Vue2 基于`Object.defineProperty`实现「响应式系统」的。
 
 而在实际的 Vue 源码中，会对每个属性单独创建 watcher，但是不是在 defineReactive 中创建的，因为在 defineReactive 中创建 Watcher 对象可能会导致问题。defineReactive 是定义在对象的每一个属性上的，如果在这里创建 Watcher，那么每当属性被访问时，都会创建一个新的 Watcher。这显然会导致内存和性能问题。
 
-**在 Vue 框架中，Watcher 对象是在编译模板时，针对每个需要动态更新的节点创建的。**当节点中的绑定的表达式被求值时（即在渲染函数中被访问时），就会触发对应的 getter 函数，进行依赖收集。
+**在 Vue 框架中，Watcher 对象是在编译模板时，通过在最上层 Vue 实例的 $mount 函数中调用 mountComponent 而新建的。**
+
+当节点中的绑定的表达式被求值时（即在渲染函数中被访问时），就会触发对应的 getter 函数，进行依赖收集。
 
 ## 补充：组件的渲染 watcher 和每个属性的 watcher
 
